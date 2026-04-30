@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Millbrook Student Response Builder</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero" aria-labelledby="app-title">
+        <div>
+          <p class="eyebrow">Millbrook</p>
+          <h1 id="app-title">Student Response Builder</h1>
+          <p class="subtitle">Choose your path, build your response, and leave with a clear next step.</p>
+        </div>
+        <div class="progress-card" aria-live="polite">
+          <span class="progress-label">Progress</span>
+          <strong id="progressText">0 of 7 steps</strong>
+          <div class="progress-track" aria-hidden="true">
+            <span id="progressBar"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <form id="responseForm" class="builder" autocomplete="off">
+          <section class="step-panel" data-step="signal">
+            <div class="step-heading">
+              <span class="step-number">1</span>
+              <div>
+                <h2>What are you noticing?</h2>
+                <p>Primary signal</p>
+              </div>
+            </div>
+            <fieldset>
+              <legend>Select one</legend>
+              <div class="choice-grid" data-group="signal"></div>
+              <label class="other-field">
+                <span>Other</span>
+                <input id="signalOther" type="text" placeholder="Describe what you are noticing">
+              </label>
+            </fieldset>
+          </section>
+
+          <section class="step-panel" data-step="lens">
+            <div class="step-heading">
+              <span class="step-number">2</span>
+              <div>
+                <h2>What might this be about?</h2>
+                <p>Interpretation lens</p>
+              </div>
+            </div>
+            <fieldset>
+              <legend>Select one lens</legend>
+              <div class="choice-grid lens-grid" data-group="lens"></div>
+            </fieldset>
+            <p class="gentle-note">You might be wrong. This is just a starting point.</p>
+          </section>
+
+          <section class="step-panel" data-step="pathway">
+            <div class="step-heading">
+              <span class="step-number">3</span>
+              <div>
+                <h2>What type of response are you activating?</h2>
+                <p>Choose your pathway</p>
+              </div>
+            </div>
+            <fieldset>
+              <legend>Select one pathway</legend>
+              <div class="pathway-columns" data-group="pathway"></div>
+            </fieldset>
+          </section>
+
+          <section class="step-panel" data-step="action">
+            <div class="step-heading">
+              <span class="step-number">4</span>
+              <div>
+                <h2>Choose one action</h2>
+                <p>Keep it small</p>
+              </div>
+            </div>
+            <fieldset>
+              <legend>Action menu</legend>
+              <div class="choice-grid" data-group="action"></div>
+            </fieldset>
+          </section>
+
+          <section class="step-panel" data-step="starter">
+            <div class="step-heading">
+              <span class="step-number">5</span>
+              <div>
+                <h2>What will you say?</h2>
+                <p>Optional conversation starter</p>
+              </div>
+            </div>
+            <fieldset>
+              <legend>Select one if useful</legend>
+              <div class="choice-grid" data-group="starter"></div>
+            </fieldset>
+          </section>
+
+          <section class="step-panel required" data-step="followUp">
+            <div class="step-heading">
+              <span class="step-number">6</span>
+              <div>
+                <h2>How will you follow up?</h2>
+                <p>Required</p>
+              </div>
+            </div>
+            <fieldset>
+              <legend>Select one follow-up plan</legend>
+              <div class="choice-grid" data-group="followUp"></div>
+            </fieldset>
+          </section>
+
+          <section class="step-panel" data-step="reflection">
+            <div class="step-heading">
+              <span class="step-number">7</span>
+              <div>
+                <h2>What happened?</h2>
+                <p>Reflection and next move</p>
+              </div>
+            </div>
+            <fieldset>
+              <legend>Outcome</legend>
+              <div class="choice-grid" data-group="outcome"></div>
+            </fieldset>
+            <fieldset>
+              <legend>Next move</legend>
+              <div class="choice-grid" data-group="nextMove"></div>
+            </fieldset>
+          </section>
+        </form>
+
+        <aside class="summary-panel" aria-labelledby="summaryTitle">
+          <div class="summary-header">
+            <div>
+              <p class="eyebrow">Response plan</p>
+              <h2 id="summaryTitle">Your current build</h2>
+            </div>
+            <span id="statusPill" class="status-pill">In progress</span>
+          </div>
+
+          <div id="summaryList" class="summary-list"></div>
+
+          <label class="notes-field">
+            <span>Private notes</span>
+            <textarea id="notes" rows="5" placeholder="Add context, student strengths, barriers, or promises to remember."></textarea>
+          </label>
+
+          <div class="summary-actions">
+            <button id="copySummary" class="primary-button" type="button">Copy summary</button>
+            <button id="printSummary" class="secondary-button" type="button">Print</button>
+            <button id="resetForm" class="ghost-button" type="button">Reset</button>
+          </div>
+          <p id="copyStatus" class="copy-status" role="status"></p>
+        </aside>
+      </section>
+    </main>
+
+    <template id="choiceTemplate">
+      <label class="choice-card">
+        <input type="radio">
+        <span class="choice-copy"></span>
+      </label>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>

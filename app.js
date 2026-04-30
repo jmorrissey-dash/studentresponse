@@ -28,37 +28,37 @@ const responseData = {
   lenses: [
     {
       name: "Connection",
-      text: "They may not feel known, supported, or like they belong"
+      text: "They may not feel known, supported, or like they belong."
     },
     {
       name: "Capacity",
-      text: "They may be overwhelmed, disorganized, or struggling to keep up"
+      text: "They may be overwhelmed, disorganized, or struggling to keep up."
     },
     {
       name: "Meaning",
-      text: "They may not see purpose, value, or relevance in what they are doing"
+      text: "They may not see purpose, value, or relevance in what they are doing."
     },
     {
       name: "Not sure yet",
-      text: "I need to learn more before choosing"
+      text: "I need to learn more before choosing."
     }
   ],
   needs: [
     {
       name: "Connection",
-      text: "More consistent, meaningful interaction with an adult"
+      text: "More consistent, meaningful interaction with an adult."
     },
     {
       name: "Structure & Support",
-      text: "Clear expectations, help getting organized, or accountability"
+      text: "Clear expectations, help getting organized, or accountability."
     },
     {
       name: "Purpose & Engagement",
-      text: "A reason to engage; connection to strengths, interests, or goals"
+      text: "A reason to engage; connection to strengths, interests, or goals."
     },
     {
       name: "Clarity",
-      text: "I need to talk with the student to better understand"
+      text: "I need to talk with the student to better understand."
     }
   ],
   moves: {
@@ -122,6 +122,13 @@ const responseData = {
 };
 
 const requiredSteps = ["returning", "signal", "lens", "need", "move", "followUp"];
+const mainSteps = ["signal", "lens", "need", "move", "followUp"];
+const suggestedMoves = {
+  Connection: "Have a quick, low-pressure check-in",
+  "Structure & Support": "Help them set one small, clear goal",
+  "Purpose & Engagement": "Ask what they care about or enjoy",
+  Clarity: "Start with a conversation to learn more"
+};
 const summaryOrder = [
   ["returning", "Returning to student"],
   ["lastOutcome", "What happened last time"],
@@ -145,6 +152,7 @@ const copyStatus = document.querySelector("#copyStatus");
 const followUpContext = document.querySelector("#followUpContext");
 const moveLegend = document.querySelector("#moveLegend");
 const followUpLegend = document.querySelector("#followUpLegend");
+const suggestedMove = document.querySelector("#suggestedMove");
 
 const state = {
   returning: "",
@@ -175,6 +183,24 @@ function createChoice(groupName, value, label = value) {
   return choice;
 }
 
+function createDescribedChoice(groupName, value, description) {
+  const choice = template.content.firstElementChild.cloneNode(true);
+  const input = choice.querySelector("input");
+  const copy = choice.querySelector(".choice-copy");
+  const title = document.createElement("strong");
+  const detail = document.createElement("span");
+
+  input.name = groupName;
+  input.value = value;
+  input.id = safeId(groupName, value);
+  title.textContent = value;
+  detail.textContent = description;
+  copy.classList.add("choice-copy-described");
+  copy.replaceChildren(title, detail);
+
+  return choice;
+}
+
 function renderSimpleGroup(groupName, values) {
   const container = document.querySelector(`[data-group="${groupName}"]`);
   container.innerHTML = "";
@@ -191,7 +217,7 @@ function renderDescribedGroup(groupName, items) {
   container.innerHTML = "";
 
   items.forEach((item) => {
-    container.append(createChoice(groupName, item.name, `${item.name}: ${item.text}`));
+    container.append(createDescribedChoice(groupName, item.name, item.text));
   });
 }
 
@@ -201,6 +227,7 @@ function renderMoves() {
 
   if (!state.need) {
     moveLegend.textContent = "Select a need first";
+    suggestedMove.textContent = "Suggested move: Select a need first";
     const empty = document.createElement("p");
     empty.className = "empty-state";
     empty.textContent = "Move options will appear after you choose a need.";
@@ -210,6 +237,7 @@ function renderMoves() {
   }
 
   moveLegend.textContent = `${state.need} moves`;
+  suggestedMove.textContent = `Suggested move: ${suggestedMoves[state.need]}`;
   responseData.moves[state.need].forEach((move) => {
     container.append(createChoice("move", move));
   });
@@ -276,16 +304,7 @@ function updateConditionalSections() {
 }
 
 function completedStepCount() {
-  const completedSteps = [
-    Boolean(state.returning),
-    Boolean(state.signal),
-    Boolean(state.lens),
-    Boolean(state.need),
-    Boolean(state.move),
-    Boolean(state.followUp)
-  ];
-
-  return completedSteps.filter(Boolean).length;
+  return mainSteps.filter((step) => Boolean(state[step])).length;
 }
 
 function isReady() {
@@ -334,8 +353,8 @@ function updateSummary() {
   });
 
   const count = completedStepCount();
-  progressText.textContent = `${count} of 6 steps`;
-  progressBar.style.width = `${Math.round((count / 6) * 100)}%`;
+  progressText.textContent = `Step ${count} of 5`;
+  progressBar.style.width = `${Math.round((count / 5) * 100)}%`;
 
   if (isReady()) {
     statusPill.textContent = "Ready";

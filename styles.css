@@ -229,6 +229,37 @@ legend {
   line-height: 1.25;
 }
 
+.choice-copy-described {
+  display: grid;
+  gap: 4px;
+}
+
+.choice-copy-described strong {
+  font-weight: 850;
+}
+
+.choice-copy-described span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.option-helper,
+.option-label {
+  grid-column: 1 / -1;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.option-label {
+  margin-top: 2px;
+  color: var(--blue-dark);
+  text-transform: uppercase;
+}
+
 .pathway-group {
   display: grid;
   gap: 10px;

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Millbrook Student Response Builder</title>
+    <title>Millbrook Student Response Flow</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -11,12 +11,12 @@
       <section class="hero" aria-labelledby="app-title">
         <div>
           <p class="eyebrow">Millbrook</p>
-          <h1 id="app-title">Student Response Builder</h1>
-          <p class="subtitle">Choose your path, build your response, and leave with a clear next step.</p>
+          <h1 id="app-title">Student Response Flow</h1>
+          <p class="subtitle">From signal to support: name what you notice, choose the need, and make one small move.</p>
         </div>
         <div class="progress-card" aria-live="polite">
           <span class="progress-label">Progress</span>
-          <strong id="progressText">0 of 7 steps</strong>
+          <strong id="progressText">0 of 6 steps</strong>
           <div class="progress-track" aria-hidden="true">
             <span id="progressBar"></span>
           </div>
@@ -25,16 +25,40 @@
 
       <section class="workspace">
         <form id="responseForm" class="builder" autocomplete="off">
+          <section class="step-panel" data-step="returning">
+            <div class="step-heading">
+              <span class="step-number">0</span>
+              <div>
+                <h2>Returning to this student?</h2>
+                <p>Start fresh or continue from previous work</p>
+              </div>
+            </div>
+            <fieldset>
+              <legend>Have you worked through this response process with this student before?</legend>
+              <div class="choice-grid" data-group="returning"></div>
+            </fieldset>
+            <div id="followUpContext" class="follow-up-context" hidden>
+              <fieldset>
+                <legend>What happened last time?</legend>
+                <div class="choice-grid" data-group="lastOutcome"></div>
+              </fieldset>
+              <fieldset>
+                <legend>What do you want to do next?</legend>
+                <div class="choice-grid" data-group="nextIntent"></div>
+              </fieldset>
+            </div>
+          </section>
+
           <section class="step-panel" data-step="signal">
             <div class="step-heading">
               <span class="step-number">1</span>
               <div>
-                <h2>What are you noticing?</h2>
-                <p>Primary signal</p>
+                <h2>Identify the signal</h2>
+                <p>What first made you pause?</p>
               </div>
             </div>
             <fieldset>
-              <legend>Select one</legend>
+              <legend>What first made you pause and think this student may need attention?</legend>
               <div class="choice-grid" data-group="signal"></div>
               <label class="other-field">
                 <span>Other</span>
@@ -47,8 +71,8 @@
             <div class="step-heading">
               <span class="step-number">2</span>
               <div>
-                <h2>What might this be about?</h2>
-                <p>Interpretation lens</p>
+                <h2>Choose a lens</h2>
+                <p>What might be going on?</p>
               </div>
             </div>
             <fieldset>
@@ -58,78 +82,51 @@
             <p class="gentle-note">You might be wrong. This is just a starting point.</p>
           </section>
 
-          <section class="step-panel" data-step="pathway">
+          <section class="step-panel" data-step="need">
             <div class="step-heading">
               <span class="step-number">3</span>
               <div>
-                <h2>What type of response are you activating?</h2>
-                <p>Choose your pathway</p>
+                <h2>Identify the need</h2>
+                <p>What does this student need most right now?</p>
               </div>
             </div>
             <fieldset>
-              <legend>Select one pathway</legend>
-              <div class="pathway-columns" data-group="pathway"></div>
+              <legend>Select one need</legend>
+              <div class="choice-grid lens-grid" data-group="need"></div>
             </fieldset>
           </section>
 
-          <section class="step-panel" data-step="action">
+          <section class="step-panel" data-step="move">
             <div class="step-heading">
               <span class="step-number">4</span>
               <div>
-                <h2>Choose one action</h2>
-                <p>Keep it small</p>
+                <h2>Choose your move</h2>
+                <p>Pick one. Small is enough.</p>
               </div>
             </div>
             <fieldset>
-              <legend>Action menu</legend>
-              <div class="choice-grid" data-group="action"></div>
-            </fieldset>
-          </section>
-
-          <section class="step-panel" data-step="starter">
-            <div class="step-heading">
-              <span class="step-number">5</span>
-              <div>
-                <h2>What will you say?</h2>
-                <p>Optional conversation starter</p>
-              </div>
-            </div>
-            <fieldset>
-              <legend>Select one if useful</legend>
-              <div class="choice-grid" data-group="starter"></div>
+              <legend id="moveLegend">Select a need first</legend>
+              <div class="choice-grid" data-group="move"></div>
             </fieldset>
           </section>
 
           <section class="step-panel required" data-step="followUp">
             <div class="step-heading">
-              <span class="step-number">6</span>
+              <span class="step-number">5</span>
               <div>
-                <h2>How will you follow up?</h2>
-                <p>Required</p>
+                <h2>Plan the follow-up</h2>
+                <p>Show this student that the interaction mattered</p>
               </div>
             </div>
             <fieldset>
-              <legend>Select one follow-up plan</legend>
+              <legend>How will you show this student that this interaction mattered?</legend>
               <div class="choice-grid" data-group="followUp"></div>
+              <label class="other-field">
+                <span>Other</span>
+                <input id="followUpOther" type="text" placeholder="Describe the follow-up plan">
+              </label>
             </fieldset>
-          </section>
-
-          <section class="step-panel" data-step="reflection">
-            <div class="step-heading">
-              <span class="step-number">7</span>
-              <div>
-                <h2>What happened?</h2>
-                <p>Reflection and next move</p>
-              </div>
-            </div>
-            <fieldset>
-              <legend>Outcome</legend>
-              <div class="choice-grid" data-group="outcome"></div>
-            </fieldset>
-            <fieldset>
-              <legend>Next move</legend>
-              <div class="choice-grid" data-group="nextMove"></div>
-            </fieldset>
+            <p class="gentle-note">This is where trust is built.</p>
           </section>
         </form>
 

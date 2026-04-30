@@ -186,7 +186,7 @@ legend {
 
 .lens-grid,
 .pathway-columns {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .choice-card {
@@ -236,6 +236,29 @@ legend {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #fbfcfc;
+}
+
+.follow-up-context {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.follow-up-context[hidden] {
+  display: none;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: #fbfcfc;
+  color: var(--muted);
+  font-weight: 700;
 }
 
 .pathway-title {

@@ -43,24 +43,47 @@ const responseData = {
       text: "I need to learn more before choosing."
     }
   ],
-  needs: [
-    {
-      name: "Connection",
-      text: "More consistent, meaningful interaction with an adult."
+  needsByLens: {
+    Connection: {
+      question: "What kind of connection support does this student need most?",
+      options: [
+        { label: "Feel seen by an adult", mappedNeed: "Connection" },
+        { label: "Build a consistent adult relationship", mappedNeed: "Connection" },
+        { label: "Feel more socially included", mappedNeed: "Connection" },
+        { label: "Reconnect with school life", mappedNeed: "Purpose & Engagement" },
+        { label: "I need to learn more", mappedNeed: "Clarity" }
+      ]
     },
-    {
-      name: "Structure & Support",
-      text: "Clear expectations, help getting organized, or accountability."
+    Capacity: {
+      question: "What kind of support would help this student function better right now?",
+      options: [
+        { label: "Organize next steps", mappedNeed: "Structure & Support" },
+        { label: "Reduce overwhelm", mappedNeed: "Structure & Support" },
+        { label: "Clarify expectations", mappedNeed: "Structure & Support" },
+        { label: "Build confidence through a small win", mappedNeed: "Purpose & Engagement" },
+        { label: "I need to learn more", mappedNeed: "Clarity" }
+      ]
     },
-    {
-      name: "Purpose & Engagement",
-      text: "A reason to engage; connection to strengths, interests, or goals."
+    Meaning: {
+      question: "What kind of meaning or engagement support does this student need?",
+      options: [
+        { label: "Connect to strengths or interests", mappedNeed: "Purpose & Engagement" },
+        { label: "Find a reason to engage", mappedNeed: "Purpose & Engagement" },
+        { label: "Feel their contribution matters", mappedNeed: "Purpose & Engagement" },
+        { label: "Build a relationship that makes engagement feel safer", mappedNeed: "Connection" },
+        { label: "I need to learn more", mappedNeed: "Clarity" }
+      ]
     },
-    {
-      name: "Clarity",
-      text: "I need to talk with the student to better understand."
+    "Not sure yet": {
+      question: "What do you need to understand first?",
+      options: [
+        { label: "What they are experiencing", mappedNeed: "Clarity" },
+        { label: "What feels hard right now", mappedNeed: "Clarity" },
+        { label: "What support they want", mappedNeed: "Clarity" },
+        { label: "Who they feel connected to", mappedNeed: "Connection" }
+      ]
     }
-  ],
+  },
   moves: {
     Connection: [
       "Have a quick, low-pressure check-in",
@@ -130,14 +153,12 @@ const suggestedMoves = {
   Clarity: "Start with a conversation to learn more"
 };
 const summaryOrder = [
-  ["returning", "Returning to student"],
-  ["lastOutcome", "What happened last time"],
-  ["nextIntent", "Next intention"],
   ["signal", "Signal"],
   ["lens", "Lens"],
-  ["need", "Need"],
+  ["need", "Selected need"],
+  ["mappedNeed", "Mapped need"],
   ["move", "Move"],
-  ["followUp", "Follow-up plan"]
+  ["followUp", "Follow-up"]
 ];
 
 const form = document.querySelector("#responseForm");
@@ -150,6 +171,7 @@ const notes = document.querySelector("#notes");
 const signalOther = document.querySelector("#signalOther");
 const copyStatus = document.querySelector("#copyStatus");
 const followUpContext = document.querySelector("#followUpContext");
+const needQuestion = document.querySelector("#needQuestion");
 const moveLegend = document.querySelector("#moveLegend");
 const followUpLegend = document.querySelector("#followUpLegend");
 const suggestedMove = document.querySelector("#suggestedMove");
@@ -161,6 +183,7 @@ const state = {
   signal: "",
   lens: "",
   need: "",
+  mappedNeed: "",
   move: "",
   followUp: "",
   notes: ""
@@ -221,11 +244,50 @@ function renderDescribedGroup(groupName, items) {
   });
 }
 
+function needOptionsForCurrentLens() {
+  return responseData.needsByLens[state.lens] || null;
+}
+
+function mappedNeedForLabel(label) {
+  const current = needOptionsForCurrentLens();
+  if (!current) return "";
+
+  const option = current.options.find((item) => item.label === label);
+  return option ? option.mappedNeed : "";
+}
+
+function renderNeeds() {
+  const container = document.querySelector('[data-group="need"]');
+  const current = needOptionsForCurrentLens();
+  container.innerHTML = "";
+
+  if (!current) {
+    needQuestion.textContent = "Select a lens first.";
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = "Need options will appear after you choose a lens.";
+    container.append(empty);
+    state.need = "";
+    state.mappedNeed = "";
+    return;
+  }
+
+  needQuestion.textContent = current.question;
+  current.options.forEach((option) => {
+    container.append(createChoice("need", option.label));
+  });
+
+  if (!mappedNeedForLabel(state.need)) {
+    state.need = "";
+    state.mappedNeed = "";
+  }
+}
+
 function renderMoves() {
   const container = document.querySelector('[data-group="move"]');
   container.innerHTML = "";
 
-  if (!state.need) {
+  if (!state.mappedNeed) {
     moveLegend.textContent = "Select a need first";
     suggestedMove.textContent = "Suggested move: Select a need first";
     const empty = document.createElement("p");
@@ -236,13 +298,13 @@ function renderMoves() {
     return;
   }
 
-  moveLegend.textContent = `${state.need} moves`;
-  suggestedMove.textContent = `Suggested move: ${suggestedMoves[state.need]}`;
-  responseData.moves[state.need].forEach((move) => {
+  moveLegend.textContent = `${state.mappedNeed} moves`;
+  suggestedMove.textContent = `Suggested move: ${suggestedMoves[state.mappedNeed]}`;
+  responseData.moves[state.mappedNeed].forEach((move) => {
     container.append(createChoice("move", move));
   });
 
-  if (!responseData.moves[state.need].includes(state.move)) {
+  if (!responseData.moves[state.mappedNeed].includes(state.move)) {
     state.move = "";
   }
 }
@@ -251,7 +313,7 @@ function renderFollowUps() {
   const container = document.querySelector('[data-group="followUp"]');
   container.innerHTML = "";
 
-  if (!state.need) {
+  if (!state.mappedNeed) {
     followUpLegend.textContent = "Select a need first";
     const empty = document.createElement("p");
     empty.className = "empty-state";
@@ -261,12 +323,12 @@ function renderFollowUps() {
     return;
   }
 
-  followUpLegend.textContent = `${state.need} follow-up options`;
-  responseData.followUps[state.need].forEach((followUp) => {
+  followUpLegend.textContent = `${state.mappedNeed} follow-up options`;
+  responseData.followUps[state.mappedNeed].forEach((followUp) => {
     container.append(createChoice("followUp", followUp));
   });
 
-  if (!responseData.followUps[state.need].includes(state.followUp)) {
+  if (!responseData.followUps[state.mappedNeed].includes(state.followUp)) {
     state.followUp = "";
   }
 }
@@ -285,6 +347,7 @@ function syncStateFromForm() {
 
   const selectedSignal = selectedValue("signal");
   state.signal = signalOther.value.trim() || selectedSignal;
+  state.mappedNeed = mappedNeedForLabel(state.need);
 
   state.followUp = selectedValue("followUp");
   state.notes = notes.value.trim();
@@ -313,10 +376,6 @@ function isReady() {
 
 function visibleSummaryRows() {
   return summaryOrder.filter(([key]) => {
-    if ((key === "lastOutcome" || key === "nextIntent") && state.returning !== "Yes, this is a follow-up") {
-      return false;
-    }
-
     return true;
   });
 }
@@ -375,13 +434,15 @@ function restoreState() {
 
   Object.assign(state, JSON.parse(saved));
   const savedMove = state.move;
+  const savedFollowUp = state.followUp;
   notes.value = state.notes || "";
 
   if (!responseData.signal.includes(state.signal) && state.signal) {
     signalOther.value = state.signal;
   }
 
-  summaryOrder.forEach(([key]) => {
+  [...summaryOrder, ["returning"], ["lastOutcome"], ["nextIntent"]].forEach(([key]) => {
+    if (key === "mappedNeed") return;
     const value = key === "signal" && signalOther.value ? "" : state[key];
     if (!value) return;
 
@@ -390,13 +451,25 @@ function restoreState() {
   });
 
   updateConditionalSections();
+  renderNeeds();
+  if (state.need) {
+    const needInput = form.querySelector(`input[name="need"][value="${CSS.escape(state.need)}"]`);
+    if (needInput) needInput.checked = true;
+  }
+  state.mappedNeed = mappedNeedForLabel(state.need);
   renderMoves();
   renderFollowUps();
   state.move = savedMove;
+  state.followUp = savedFollowUp;
 
   if (savedMove) {
     const moveInput = form.querySelector(`input[name="move"][value="${CSS.escape(savedMove)}"]`);
     if (moveInput) moveInput.checked = true;
+  }
+
+  if (savedFollowUp) {
+    const followUpInput = form.querySelector(`input[name="followUp"][value="${CSS.escape(savedFollowUp)}"]`);
+    if (followUpInput) followUpInput.checked = true;
   }
 }
 
@@ -405,7 +478,18 @@ function handleChange(event) {
   syncStateFromForm();
   updateConditionalSections();
 
+  if (changedName === "lens") {
+    state.need = "";
+    state.mappedNeed = "";
+    state.move = "";
+    state.followUp = "";
+    renderNeeds();
+    renderMoves();
+    renderFollowUps();
+  }
+
   if (changedName === "need") {
+    state.mappedNeed = mappedNeedForLabel(state.need);
     state.move = "";
     state.followUp = "";
     renderMoves();
@@ -426,6 +510,7 @@ function resetAll() {
   });
   localStorage.removeItem("millbrook-response-flow");
   updateConditionalSections();
+  renderNeeds();
   renderMoves();
   renderFollowUps();
   updateSummary();
@@ -437,12 +522,13 @@ renderSimpleGroup("lastOutcome", responseData.lastOutcome);
 renderSimpleGroup("nextIntent", responseData.nextIntent);
 renderSimpleGroup("signal", responseData.signal);
 renderDescribedGroup("lens", responseData.lenses);
-renderDescribedGroup("need", responseData.needs);
+renderNeeds();
 renderMoves();
 renderFollowUps();
 restoreState();
 syncStateFromForm();
 updateConditionalSections();
+renderNeeds();
 renderMoves();
 renderFollowUps();
 updateSummary();

@@ -66,30 +66,59 @@ const responseData = {
       "Have a quick, low-pressure check-in",
       "Ask 1-2 real questions and listen",
       "Follow up on something they have shared",
-      "Connect them with another adult"
+      "Notice and name something specific you have seen",
+      "Connect them with another adult",
+      "Acknowledge them publicly or privately"
     ],
     "Structure & Support": [
       "Help them set one small, clear goal",
       "Break a task into next steps",
       "Identify one barrier and one support",
-      "Set a simple check-in or accountability point"
+      "Set a simple check-in or accountability point",
+      "Clarify expectations or priorities",
+      "Offer a quick reset or fresh start"
     ],
     "Purpose & Engagement": [
       "Ask what they care about or enjoy",
       "Name a strength you see",
       "Connect work to an interest or goal",
-      "Give them a small role or responsibility"
+      "Give them a small role or responsibility",
+      "Invite their input or perspective",
+      "Help them see progress or growth"
     ],
     Clarity: [
-      "Start with a conversation to learn more"
+      "Start with a conversation to learn more",
+      "Ask what has been harder than usual",
+      "Ask what is going well",
+      "Ask what they need right now"
     ]
   },
-  followUp: [
-    "Check back in within a few days",
-    "Reference something they shared",
-    "Follow through on something you said you would do",
-    "Loop in another adult for support"
-  ]
+  followUps: {
+    Connection: [
+      "Check back in within a few days",
+      "Reference something they shared",
+      "Notice and name another moment you have seen",
+      "Help deepen or expand their connections"
+    ],
+    "Structure & Support": [
+      "Check in on progress toward the goal",
+      "Follow through on accountability",
+      "Adjust the plan or next steps",
+      "Reinforce effort or small wins"
+    ],
+    "Purpose & Engagement": [
+      "Revisit what they care about or enjoy",
+      "Name growth, effort, or progress",
+      "Build on their interest or role",
+      "Invite further input or ownership"
+    ],
+    Clarity: [
+      "Follow up after your initial conversation",
+      "Reflect back what you heard",
+      "Ask a deeper or more focused question",
+      "Decide on a clearer next step together"
+    ]
+  }
 };
 
 const requiredSteps = ["returning", "signal", "lens", "need", "move", "followUp"];
@@ -112,10 +141,10 @@ const progressBar = document.querySelector("#progressBar");
 const statusPill = document.querySelector("#statusPill");
 const notes = document.querySelector("#notes");
 const signalOther = document.querySelector("#signalOther");
-const followUpOther = document.querySelector("#followUpOther");
 const copyStatus = document.querySelector("#copyStatus");
 const followUpContext = document.querySelector("#followUpContext");
 const moveLegend = document.querySelector("#moveLegend");
+const followUpLegend = document.querySelector("#followUpLegend");
 
 const state = {
   returning: "",
@@ -190,6 +219,30 @@ function renderMoves() {
   }
 }
 
+function renderFollowUps() {
+  const container = document.querySelector('[data-group="followUp"]');
+  container.innerHTML = "";
+
+  if (!state.need) {
+    followUpLegend.textContent = "Select a need first";
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = "Follow-up options will appear after you choose a need.";
+    container.append(empty);
+    state.followUp = "";
+    return;
+  }
+
+  followUpLegend.textContent = `${state.need} follow-up options`;
+  responseData.followUps[state.need].forEach((followUp) => {
+    container.append(createChoice("followUp", followUp));
+  });
+
+  if (!responseData.followUps[state.need].includes(state.followUp)) {
+    state.followUp = "";
+  }
+}
+
 function selectedValue(name) {
   const selected = form.querySelector(`input[name="${name}"]:checked`);
   return selected ? selected.value : "";
@@ -205,8 +258,7 @@ function syncStateFromForm() {
   const selectedSignal = selectedValue("signal");
   state.signal = signalOther.value.trim() || selectedSignal;
 
-  const selectedFollowUp = selectedValue("followUp");
-  state.followUp = followUpOther.value.trim() || selectedFollowUp;
+  state.followUp = selectedValue("followUp");
   state.notes = notes.value.trim();
 }
 
@@ -310,12 +362,8 @@ function restoreState() {
     signalOther.value = state.signal;
   }
 
-  if (!responseData.followUp.includes(state.followUp) && state.followUp) {
-    followUpOther.value = state.followUp;
-  }
-
   summaryOrder.forEach(([key]) => {
-    const value = key === "signal" && signalOther.value ? "" : key === "followUp" && followUpOther.value ? "" : state[key];
+    const value = key === "signal" && signalOther.value ? "" : state[key];
     if (!value) return;
 
     const input = form.querySelector(`input[name="${key}"][value="${CSS.escape(value)}"]`);
@@ -324,6 +372,7 @@ function restoreState() {
 
   updateConditionalSections();
   renderMoves();
+  renderFollowUps();
   state.move = savedMove;
 
   if (savedMove) {
@@ -339,7 +388,9 @@ function handleChange(event) {
 
   if (changedName === "need") {
     state.move = "";
+    state.followUp = "";
     renderMoves();
+    renderFollowUps();
   }
 
   syncStateFromForm();
@@ -351,13 +402,13 @@ function resetAll() {
   form.reset();
   notes.value = "";
   signalOther.value = "";
-  followUpOther.value = "";
   Object.keys(state).forEach((key) => {
     state[key] = "";
   });
   localStorage.removeItem("millbrook-response-flow");
   updateConditionalSections();
   renderMoves();
+  renderFollowUps();
   updateSummary();
   copyStatus.textContent = "";
 }
@@ -368,17 +419,17 @@ renderSimpleGroup("nextIntent", responseData.nextIntent);
 renderSimpleGroup("signal", responseData.signal);
 renderDescribedGroup("lens", responseData.lenses);
 renderDescribedGroup("need", responseData.needs);
-renderSimpleGroup("followUp", responseData.followUp);
 renderMoves();
+renderFollowUps();
 restoreState();
 syncStateFromForm();
 updateConditionalSections();
 renderMoves();
+renderFollowUps();
 updateSummary();
 
 form.addEventListener("change", handleChange);
 signalOther.addEventListener("input", handleChange);
-followUpOther.addEventListener("input", handleChange);
 notes.addEventListener("input", handleChange);
 
 document.querySelector("#copySummary").addEventListener("click", async () => {

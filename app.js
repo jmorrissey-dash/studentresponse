@@ -179,6 +179,7 @@ const progressBar = document.querySelector("#progressBar");
 const statusPill = document.querySelector("#statusPill");
 const notes = document.querySelector("#notes");
 const signalOther = document.querySelector("#signalOther");
+const studentName = document.querySelector("#studentName");
 const copyStatus = document.querySelector("#copyStatus");
 const followUpContext = document.querySelector("#followUpContext");
 const needQuestion = document.querySelector("#needQuestion");
@@ -201,6 +202,7 @@ const state = {
   mappedNeed: "",
   move: "",
   followUp: "",
+  studentName: "",
   notes: "",
   generatedSummary: ""
 };
@@ -416,6 +418,7 @@ function syncStateFromForm() {
   state.mappedNeed = mappedNeedForLabel(state.need);
 
   state.followUp = selectedValue("followUp");
+  state.studentName = studentName.value.trim();
   state.notes = notes.value.trim();
 }
 
@@ -489,15 +492,20 @@ function signalPhrase(text) {
   return phrases[text] || actionPhrase(text);
 }
 
+function studentReference() {
+  return state.studentName || "this student";
+}
+
 function openingSentence() {
   const signal = signalPhrase(state.signal);
   const lens = lensPhrases[state.lens] || "a supportive lens";
+  const student = studentReference();
   const openings = [
-    `You've been noticing ${signal}, and this could be a moment to think about the student through ${lens}.`,
-    `You've noticed that there has been ${signal}, and this may be a moment to consider the student through ${lens}.`,
-    `Based on what you're seeing, ${signal} may point toward a need for ${lens}.`,
-    `Given what's been coming up, this could be a moment to think about the student through ${lens}, especially noticing ${signal}.`,
-    `This begins with noticing ${signal} and considering it through ${lens}.`
+    `You've been noticing ${signal} for ${student}, and this could be a moment to think about the student through ${lens}.`,
+    `You've noticed that there has been ${signal} for ${student}, and this may be a moment to consider the student through ${lens}.`,
+    `Based on what you're seeing for ${student}, ${signal} may point toward a need for ${lens}.`,
+    `Given what's been coming up for ${student}, this could be a moment to think about the student through ${lens}, especially noticing ${signal}.`,
+    `This begins with noticing ${signal} for ${student} and considering it through ${lens}.`
   ];
   const seed = `${state.signal}|${state.lens}|${state.need}`.split("").reduce((total, char) => total + char.charCodeAt(0), 0);
 
@@ -588,7 +596,8 @@ function updateSummary() {
 }
 
 function saveState() {
-  localStorage.setItem("millbrook-response-flow", JSON.stringify(state));
+  const { studentName: _studentName, generatedSummary: _generatedSummary, ...persistedState } = state;
+  localStorage.setItem("millbrook-response-flow", JSON.stringify(persistedState));
 }
 
 function restoreState() {
@@ -598,6 +607,8 @@ function restoreState() {
   Object.assign(state, JSON.parse(saved));
   const savedMove = state.move;
   const savedFollowUp = state.followUp;
+  state.studentName = "";
+  state.generatedSummary = "";
   notes.value = state.notes || "";
 
   if (!responseData.signal.includes(state.signal) && state.signal) {
@@ -671,7 +682,7 @@ function handleChange(event) {
     renderFollowUps();
   }
 
-  if (["signal", "followUp"].includes(changedName) || event.target.id === "signalOther") {
+  if (["signal", "followUp"].includes(changedName) || event.target.id === "signalOther" || event.target.id === "studentName") {
     state.generatedSummary = "";
   }
 
@@ -684,6 +695,7 @@ function resetAll() {
   form.reset();
   notes.value = "";
   signalOther.value = "";
+  studentName.value = "";
   Object.keys(state).forEach((key) => {
     state[key] = "";
   });
@@ -717,6 +729,7 @@ updateSummary();
 
 form.addEventListener("change", handleChange);
 signalOther.addEventListener("input", handleChange);
+studentName.addEventListener("input", handleChange);
 notes.addEventListener("input", handleChange);
 
 document.querySelector("#copySummary").addEventListener("click", async () => {

@@ -160,6 +160,7 @@ const summaryOrder = [
   ["move", "Move"],
   ["followUp", "Follow-up"]
 ];
+const radioStateKeys = ["returning", "lastOutcome", "nextIntent", "lens", "need", "move"];
 
 const form = document.querySelector("#responseForm");
 const template = document.querySelector("#choiceTemplate");
@@ -335,6 +336,16 @@ function renderFollowUps() {
     return;
   }
 
+  if (!state.move) {
+    followUpLegend.textContent = "Choose a move first";
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = "Follow-up options will appear after you choose a move.";
+    container.append(empty);
+    state.followUp = "";
+    return;
+  }
+
   followUpLegend.textContent = `${state.mappedNeed} follow-up options`;
   responseData.followUps[state.mappedNeed].forEach((followUp) => {
     container.append(createChoice("followUp", followUp));
@@ -351,10 +362,8 @@ function selectedValue(name) {
 }
 
 function syncStateFromForm() {
-  summaryOrder.forEach(([key]) => {
-    if (key !== "signal" && key !== "followUp") {
-      state[key] = selectedValue(key);
-    }
+  radioStateKeys.forEach((key) => {
+    state[key] = selectedValue(key);
   });
 
   const selectedSignal = selectedValue("signal");
@@ -577,7 +586,13 @@ function handleChange(event) {
     renderFollowUps();
   }
 
-  if (["signal", "move", "followUp"].includes(changedName) || event.target.id === "signalOther") {
+  if (changedName === "move") {
+    state.followUp = "";
+    state.generatedSummary = "";
+    renderFollowUps();
+  }
+
+  if (["signal", "followUp"].includes(changedName) || event.target.id === "signalOther") {
     state.generatedSummary = "";
   }
 

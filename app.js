@@ -474,6 +474,36 @@ function actionPhrase(text) {
   return text.charAt(0).toLowerCase() + text.slice(1);
 }
 
+function signalPhrase(text) {
+  const phrases = {
+    "Drop in academic engagement": "a drop in academic engagement",
+    "Low student-life engagement": "low student-life engagement",
+    "Few or no adult connections": "few or no adult connections",
+    "Increase in infractions or behavioral concerns": "an increase in infractions or behavioral concerns",
+    "Attendance or follow-through concerns": "attendance or follow-through concerns",
+    "Student seems socially disconnected": "the student seeming socially disconnected",
+    "Student appears fine but may be overlooked": "the student appearing fine but possibly being overlooked",
+    "Other / not sure": "something that may need a closer look"
+  };
+
+  return phrases[text] || actionPhrase(text);
+}
+
+function openingSentence() {
+  const signal = signalPhrase(state.signal);
+  const lens = lensPhrases[state.lens] || "a supportive lens";
+  const openings = [
+    `You've been noticing ${signal}, and this could be a moment to think about the student through ${lens}.`,
+    `You've noticed that there has been ${signal}, and this may be a moment to consider the student through ${lens}.`,
+    `Based on what you're seeing, ${signal} may point toward a need for ${lens}.`,
+    `Given what's been coming up, this could be a moment to think about the student through ${lens}, especially noticing ${signal}.`,
+    `This begins with noticing ${signal} and considering it through ${lens}.`
+  ];
+  const seed = `${state.signal}|${state.lens}|${state.need}`.split("").reduce((total, char) => total + char.charCodeAt(0), 0);
+
+  return openings[seed % openings.length];
+}
+
 function followUpPhrase(text) {
   const gerunds = {
     Check: "checking",
@@ -506,10 +536,10 @@ function generatedSummary() {
   }
 
   return [
-    `You noticed ${actionPhrase(state.signal)} and are approaching this through ${lensPhrases[state.lens] || "a supportive lens"}.`,
-    `You are focusing on helping the student ${needPhrases[state.need] || actionPhrase(state.need)}.`,
-    `Your next step is to ${actionPhrase(state.move)}.`,
-    `You will follow up by ${followUpPhrase(state.followUp)}, reinforcing that the interaction mattered.`,
+    openingSentence(),
+    `This may be less about solving a problem and more about helping them ${needPhrases[state.need] || actionPhrase(state.need)}.`,
+    `A simple next step might be to ${actionPhrase(state.move)}, keeping the interaction low-pressure and genuine.`,
+    `It could help to circle back by ${followUpPhrase(state.followUp)}, showing that the interaction mattered.`,
     "Small, consistent follow-through will help build trust over time."
   ].join(" ");
 }

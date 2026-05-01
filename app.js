@@ -639,6 +639,7 @@ function resetAll() {
   });
   localStorage.removeItem("millbrook-response-flow");
   updateConditionalSections();
+  renderLenses();
   renderNeeds();
   renderMoves();
   renderFollowUps();

@@ -152,6 +152,15 @@ const suggestedMoves = {
   "Purpose & Engagement": "Ask what they care about or enjoy",
   Clarity: "Start with a conversation to learn more"
 };
+const suggestedLensesBySignal = {
+  "Drop in academic engagement": ["Capacity", "Meaning"],
+  "Low student-life engagement": ["Meaning", "Connection"],
+  "Few or no adult connections": ["Connection"],
+  "Increase in infractions or behavioral concerns": ["Capacity"],
+  "Attendance or follow-through concerns": ["Capacity"],
+  "Student seems socially disconnected": ["Connection"],
+  "Student appears fine but may be overlooked": ["Connection"]
+};
 const summaryOrder = [
   ["signal", "Signal"],
   ["lens", "Lens"],
@@ -176,6 +185,7 @@ const needQuestion = document.querySelector("#needQuestion");
 const moveLegend = document.querySelector("#moveLegend");
 const followUpLegend = document.querySelector("#followUpLegend");
 const suggestedMove = document.querySelector("#suggestedMove");
+const suggestedLensLabel = document.querySelector("#suggestedLensLabel");
 const generatedSummaryText = document.querySelector("#generatedSummaryText");
 const generateSummaryButton = document.querySelector("#generateSummary");
 const copyGeneratedSummaryButton = document.querySelector("#copyGeneratedSummary");
@@ -254,6 +264,26 @@ function renderDescribedGroup(groupName, items) {
 
   items.forEach((item) => {
     container.append(createDescribedChoice(groupName, item.name, item.text));
+  });
+}
+
+function renderLenses() {
+  const container = document.querySelector('[data-group="lens"]');
+  const suggestedLenses = suggestedLensesBySignal[state.signal] || [];
+  container.innerHTML = "";
+  suggestedLensLabel.hidden = suggestedLenses.length === 0;
+
+  responseData.lenses.forEach((item) => {
+    const choice = createDescribedChoice("lens", item.name, item.text);
+    if (suggestedLenses.includes(item.name)) {
+      choice.classList.add("choice-card-suggested");
+      const badge = document.createElement("span");
+      badge.className = "suggested-badge";
+      badge.setAttribute("aria-hidden", "true");
+      badge.textContent = "Suggested";
+      choice.append(badge);
+    }
+    container.append(choice);
   });
 }
 
@@ -577,6 +607,10 @@ function handleChange(event) {
     renderFollowUps();
   }
 
+  if (changedName === "signal" || event.target.id === "signalOther") {
+    renderLenses();
+  }
+
   if (changedName === "need") {
     state.mappedNeed = mappedNeedForLabel(state.need);
     state.move = "";
@@ -622,13 +656,14 @@ renderSimpleGroup("returning", responseData.returning);
 renderSimpleGroup("lastOutcome", responseData.lastOutcome);
 renderSimpleGroup("nextIntent", responseData.nextIntent);
 renderSimpleGroup("signal", responseData.signal);
-renderDescribedGroup("lens", responseData.lenses);
+renderLenses();
 renderNeeds();
 renderMoves();
 renderFollowUps();
 restoreState();
 syncStateFromForm();
 updateConditionalSections();
+renderLenses();
 renderNeeds();
 renderMoves();
 renderFollowUps();

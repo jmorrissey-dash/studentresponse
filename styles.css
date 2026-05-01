@@ -1,15 +1,17 @@
 :root {
-  --ink: #17212b;
-  --muted: #60707f;
-  --paper: #f7f6f1;
-  --panel: #ffffff;
-  --line: #d9dedf;
-  --blue: #246b83;
-  --blue-dark: #164c60;
-  --green: #3f7f58;
-  --gold: #b37821;
-  --rose: #a44e5a;
-  --shadow: 0 18px 48px rgba(21, 36, 48, 0.14);
+  --ink: #1F2933;
+  --muted: #6B7C8F;
+  --paper: #F5F8FA;
+  --panel: #FFFFFF;
+  --line: #d7e0e7;
+  --blue: #023859;
+  --blue-dark: #023859;
+  --blue-hover: #0A4F73;
+  --accent: #1F6A8C;
+  --green: #1F6A8C;
+  --gold: #1F6A8C;
+  --rose: #0A4F73;
+  --shadow: 0 18px 48px rgba(2, 56, 89, 0.12);
   --radius: 8px;
 }
 
@@ -20,10 +22,7 @@
 body {
   margin: 0;
   color: var(--ink);
-  background:
-    linear-gradient(135deg, rgba(36, 107, 131, 0.12), transparent 34%),
-    linear-gradient(225deg, rgba(63, 127, 88, 0.12), transparent 28%),
-    var(--paper);
+  background: var(--paper);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -49,11 +48,24 @@ textarea {
 
 .eyebrow {
   margin: 0 0 6px;
-  color: var(--blue-dark);
+  color: var(--accent);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.brand-lockup {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.school-logo {
+  width: clamp(52px, 7vw, 74px);
+  height: auto;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 h1,
@@ -64,8 +76,13 @@ h2 {
 
 h1 {
   max-width: 760px;
-  font-size: clamp(2.25rem, 6vw, 4.8rem);
-  line-height: 0.95;
+  color: var(--blue);
+  font-size: clamp(2.25rem, 4.6vw, 4rem);
+  line-height: 1;
+}
+
+h2 {
+  color: var(--blue);
 }
 
 .subtitle {
@@ -79,8 +96,8 @@ h1 {
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 10px 28px rgba(21, 36, 48, 0.08);
+  background: var(--panel);
+  box-shadow: 0 10px 28px rgba(2, 56, 89, 0.08);
 }
 
 .progress-label {
@@ -104,7 +121,7 @@ h1 {
   width: 0;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--blue), var(--green));
+  background: linear-gradient(90deg, var(--blue), var(--accent));
   transition: width 180ms ease;
 }
 
@@ -124,8 +141,8 @@ h1 {
 .summary-panel {
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 8px 24px rgba(21, 36, 48, 0.07);
+  background: var(--panel);
+  box-shadow: 0 8px 24px rgba(2, 56, 89, 0.07);
 }
 
 .step-panel {
@@ -133,7 +150,7 @@ h1 {
 }
 
 .step-panel.required {
-  border-color: rgba(164, 78, 90, 0.45);
+  border-color: rgba(31, 106, 140, 0.45);
 }
 
 .step-heading {
@@ -204,8 +221,8 @@ legend {
 }
 
 .choice-card:hover {
-  border-color: rgba(36, 107, 131, 0.55);
-  box-shadow: 0 8px 18px rgba(21, 36, 48, 0.08);
+  border-color: rgba(10, 79, 115, 0.65);
+  box-shadow: 0 8px 18px rgba(2, 56, 89, 0.08);
   transform: translateY(-1px);
 }
 
@@ -218,8 +235,8 @@ legend {
 
 .choice-card:has(input:checked) {
   border-color: var(--blue);
-  background: #eef7f8;
-  box-shadow: inset 0 0 0 1px rgba(36, 107, 131, 0.34);
+  background: #EAF3F7;
+  box-shadow: inset 0 0 0 1px rgba(2, 56, 89, 0.34);
 }
 
 .choice-copy {
@@ -256,7 +273,7 @@ legend {
 
 .option-label {
   margin-top: 2px;
-  color: var(--blue-dark);
+  color: var(--accent);
   text-transform: uppercase;
 }
 
@@ -266,7 +283,7 @@ legend {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: #fbfcfc;
+  background: #FAFCFD;
 }
 
 .follow-up-context {
@@ -287,7 +304,7 @@ legend {
   padding: 14px;
   border: 1px dashed var(--line);
   border-radius: var(--radius);
-  background: #fbfcfc;
+  background: #FAFCFD;
   color: var(--muted);
   font-weight: 700;
 }
@@ -295,7 +312,7 @@ legend {
 .pathway-title {
   font-size: 0.82rem;
   font-weight: 850;
-  color: var(--blue-dark);
+  color: var(--accent);
   text-transform: uppercase;
 }
 
@@ -331,17 +348,17 @@ textarea {
 
 input[type="text"]:focus,
 textarea:focus {
-  outline: 3px solid rgba(36, 107, 131, 0.18);
+  outline: 3px solid rgba(31, 106, 140, 0.18);
   border-color: var(--blue);
 }
 
 .gentle-note {
   margin: 14px 0 0;
   padding: 10px 12px;
-  border-left: 4px solid var(--gold);
+  border-left: 4px solid var(--accent);
   border-radius: 0 var(--radius) var(--radius) 0;
-  background: #fff7e8;
-  color: #6c4a15;
+  background: #EAF3F7;
+  color: var(--blue);
   font-weight: 700;
 }
 
@@ -373,8 +390,8 @@ textarea:focus {
 }
 
 .status-pill.complete {
-  background: #e6f4eb;
-  color: var(--green);
+  background: #EAF3F7;
+  color: var(--accent);
 }
 
 .summary-list {
@@ -387,7 +404,7 @@ textarea:focus {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: #fbfcfc;
+  background: #FAFCFD;
 }
 
 .summary-item span {
@@ -426,23 +443,36 @@ button {
 }
 
 .secondary-button {
-  background: #e8eeee;
-  color: var(--blue-dark);
+  background: #EAF3F7;
+  color: var(--blue);
 }
 
 .ghost-button {
   background: transparent;
-  color: var(--rose);
+  color: var(--blue-hover);
 }
 
 button:hover {
-  filter: brightness(0.96);
+  filter: none;
+}
+
+.primary-button:hover {
+  background: var(--blue-hover);
+}
+
+.secondary-button:hover {
+  background: #DCECF3;
+}
+
+.ghost-button:hover {
+  color: var(--blue);
+  background: #EAF3F7;
 }
 
 .copy-status {
   min-height: 20px;
   margin: 10px 0 0;
-  color: var(--green);
+  color: var(--accent);
   font-size: 0.9rem;
   font-weight: 750;
 }
@@ -469,6 +499,14 @@ button:hover {
     padding-top: 10px;
   }
 
+  .brand-lockup {
+    gap: 10px;
+  }
+
+  .school-logo {
+    width: 42px;
+  }
+
   .choice-grid,
   .lens-grid,
   .pathway-columns,
@@ -482,7 +520,8 @@ button:hover {
   }
 
   h1 {
-    font-size: 2.45rem;
+    font-size: clamp(1.45rem, 6vw, 2.05rem);
+    white-space: nowrap;
   }
 }
 

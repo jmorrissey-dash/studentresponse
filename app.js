@@ -277,11 +277,6 @@ function renderLenses() {
     const choice = createDescribedChoice("lens", item.name, item.text);
     if (suggestedLenses.includes(item.name)) {
       choice.classList.add("choice-card-suggested");
-      const badge = document.createElement("span");
-      badge.className = "suggested-badge";
-      badge.setAttribute("aria-hidden", "true");
-      badge.textContent = "Suggested";
-      choice.append(badge);
     }
     container.append(choice);
   });

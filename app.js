@@ -206,10 +206,30 @@ const state = {
 };
 
 const lensPhrases = {
-  Connection: "the student may not feel fully known, supported, or connected",
-  Capacity: "the student may be feeling overwhelmed or may need more structure to keep up",
-  Meaning: "the student may need more purpose, relevance, or connection to what they are doing",
-  "Not sure yet": "there is more to understand before deciding what kind of support will help most"
+  Connection: "a connection lens",
+  Capacity: "a capacity lens",
+  Meaning: "a meaning lens",
+  "Not sure yet": "a learning-more lens"
+};
+
+const needPhrases = {
+  "Feel seen by an adult": "feel seen by an adult",
+  "Build a consistent adult relationship": "build a consistent relationship with an adult",
+  "Feel more socially included": "feel more socially included",
+  "Reconnect with school life": "reconnect with school life",
+  "I need to learn more": "share more about what is going on",
+  "Organize next steps": "organize the next steps",
+  "Reduce overwhelm": "reduce overwhelm",
+  "Clarify expectations": "understand expectations more clearly",
+  "Build confidence through a small win": "build confidence through a small win",
+  "Connect to strengths or interests": "connect school life to their strengths or interests",
+  "Find a reason to engage": "find a reason to engage",
+  "Feel their contribution matters": "feel that their contribution matters",
+  "Build a relationship that makes engagement feel safer": "build a relationship that makes engagement feel safer",
+  "What they are experiencing": "name what they are experiencing",
+  "What feels hard right now": "identify what feels hard right now",
+  "What support they want": "clarify what support they want",
+  "Who they feel connected to": "identify who they feel connected to"
 };
 
 function safeId(groupName, value) {
@@ -486,11 +506,11 @@ function generatedSummary() {
   }
 
   return [
-    `You noticed ${actionPhrase(state.signal)}.`,
-    `This suggests ${lensPhrases[state.lens] || "the student may need a closer look and a supportive next step"}.`,
-    `Based on that, you are focusing on helping them ${actionPhrase(state.need)}.`,
+    `You noticed ${actionPhrase(state.signal)} and are approaching this through ${lensPhrases[state.lens] || "a supportive lens"}.`,
+    `You are focusing on helping the student ${needPhrases[state.need] || actionPhrase(state.need)}.`,
     `Your next step is to ${actionPhrase(state.move)}.`,
-    `You plan to follow up by ${followUpPhrase(state.followUp)}.`
+    `You will follow up by ${followUpPhrase(state.followUp)}, reinforcing that the interaction mattered.`,
+    "Small, consistent follow-through will help build trust over time."
   ].join(" ");
 }
 

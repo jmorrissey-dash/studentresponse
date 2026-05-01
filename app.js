@@ -175,6 +175,10 @@ const needQuestion = document.querySelector("#needQuestion");
 const moveLegend = document.querySelector("#moveLegend");
 const followUpLegend = document.querySelector("#followUpLegend");
 const suggestedMove = document.querySelector("#suggestedMove");
+const generatedSummaryText = document.querySelector("#generatedSummaryText");
+const generateSummaryButton = document.querySelector("#generateSummary");
+const copyGeneratedSummaryButton = document.querySelector("#copyGeneratedSummary");
+const generatedCopyStatus = document.querySelector("#generatedCopyStatus");
 
 const state = {
   returning: "",
@@ -186,7 +190,15 @@ const state = {
   mappedNeed: "",
   move: "",
   followUp: "",
-  notes: ""
+  notes: "",
+  generatedSummary: ""
+};
+
+const lensPhrases = {
+  Connection: "the student may not feel fully known, supported, or connected",
+  Capacity: "the student may be feeling overwhelmed or may need more structure to keep up",
+  Meaning: "the student may need more purpose, relevance, or connection to what they are doing",
+  "Not sure yet": "there is more to understand before deciding what kind of support will help most"
 };
 
 function safeId(groupName, value) {
@@ -370,6 +382,10 @@ function completedStepCount() {
   return mainSteps.filter((step) => Boolean(state[step])).length;
 }
 
+function canGenerateSummary() {
+  return mainSteps.every((step) => Boolean(state[step]));
+}
+
 function isReady() {
   return requiredSteps.every((step) => Boolean(state[step]));
 }
@@ -392,6 +408,66 @@ function summaryText() {
   }
 
   return lines.join("\n");
+}
+
+function sentenceCase(text) {
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function actionPhrase(text) {
+  if (!text) return "";
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}
+
+function followUpPhrase(text) {
+  const gerunds = {
+    Check: "checking",
+    Reference: "referencing",
+    Notice: "noticing",
+    Help: "helping",
+    Follow: "following",
+    Adjust: "adjusting",
+    Reinforce: "reinforcing",
+    Revisit: "revisiting",
+    Name: "naming",
+    Build: "building",
+    Invite: "inviting",
+    Reflect: "reflecting",
+    Ask: "asking",
+    Decide: "deciding"
+  };
+  const [firstWord, ...rest] = text.split(" ");
+
+  if (gerunds[firstWord]) {
+    return [gerunds[firstWord], ...rest].join(" ").toLowerCase();
+  }
+
+  return actionPhrase(text);
+}
+
+function generatedSummary() {
+  if (!canGenerateSummary()) {
+    return "";
+  }
+
+  return [
+    `You noticed ${actionPhrase(state.signal)}.`,
+    `This suggests ${lensPhrases[state.lens] || "the student may need a closer look and a supportive next step"}.`,
+    `Based on that, you are focusing on helping them ${actionPhrase(state.need)}.`,
+    `Your next step is to ${actionPhrase(state.move)}.`,
+    `You plan to follow up by ${followUpPhrase(state.followUp)}.`
+  ].join(" ");
+}
+
+function updateGeneratedSummary() {
+  if (state.generatedSummary) {
+    generatedSummaryText.textContent = state.generatedSummary;
+    copyGeneratedSummaryButton.disabled = false;
+  } else {
+    generatedSummaryText.textContent = "Complete the flow, then generate a summary.";
+    copyGeneratedSummaryButton.disabled = true;
+  }
 }
 
 function updateSummary() {
@@ -422,6 +498,9 @@ function updateSummary() {
     statusPill.textContent = "In progress";
     statusPill.classList.remove("complete");
   }
+
+  generateSummaryButton.disabled = !canGenerateSummary();
+  updateGeneratedSummary();
 }
 
 function saveState() {
@@ -483,6 +562,7 @@ function handleChange(event) {
     state.mappedNeed = "";
     state.move = "";
     state.followUp = "";
+    state.generatedSummary = "";
     renderNeeds();
     renderMoves();
     renderFollowUps();
@@ -492,8 +572,13 @@ function handleChange(event) {
     state.mappedNeed = mappedNeedForLabel(state.need);
     state.move = "";
     state.followUp = "";
+    state.generatedSummary = "";
     renderMoves();
     renderFollowUps();
+  }
+
+  if (["signal", "move", "followUp"].includes(changedName) || event.target.id === "signalOther") {
+    state.generatedSummary = "";
   }
 
   syncStateFromForm();
@@ -515,6 +600,7 @@ function resetAll() {
   renderFollowUps();
   updateSummary();
   copyStatus.textContent = "";
+  generatedCopyStatus.textContent = "";
 }
 
 renderSimpleGroup("returning", responseData.returning);
@@ -555,6 +641,42 @@ document.querySelector("#copySummary").addEventListener("click", async () => {
   }
 
   copyStatus.textContent = "Summary copied.";
+});
+
+generateSummaryButton.addEventListener("click", () => {
+  const text = generatedSummary();
+
+  if (!text) {
+    state.generatedSummary = "";
+    generatedSummaryText.textContent = "Select a signal, lens, need, move, and follow-up first.";
+    copyGeneratedSummaryButton.disabled = true;
+    return;
+  }
+
+  state.generatedSummary = text;
+  generatedCopyStatus.textContent = "";
+  updateGeneratedSummary();
+  saveState();
+});
+
+copyGeneratedSummaryButton.addEventListener("click", async () => {
+  if (!state.generatedSummary) return;
+
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(state.generatedSummary);
+  } else {
+    const helper = document.createElement("textarea");
+    helper.value = state.generatedSummary;
+    helper.setAttribute("readonly", "");
+    helper.style.position = "fixed";
+    helper.style.left = "-9999px";
+    document.body.append(helper);
+    helper.select();
+    document.execCommand("copy");
+    helper.remove();
+  }
+
+  generatedCopyStatus.textContent = "Summary copied.";
 });
 
 document.querySelector("#printSummary").addEventListener("click", () => {
